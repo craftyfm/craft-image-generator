@@ -1,0 +1,61 @@
+{% extends "_layouts/cp" %}
+{% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') -%}
+
+
+{% set title = "Image Types"|t('image-generator') %}
+{% set crumbs = [
+    { label: "Image Generator"|t('image-generator'), url: url('image-generator') }
+] %}
+
+{% block actionButton %}
+    {% if craft.app.config.general.allowAdminChanges %}
+        <a class="btn submit add icon" href="{{ cpUrl('image-generator/types/new') }}">{{ "New Type"|t('image-generator') }}</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div id="types-admin-table"></div>
+    <script>
+        var tableData = {{ tableData|json_encode|raw }}
+        {% if craft.app.config.general.allowAdminChanges %}
+            var deleteAction = "{{ actionUrl('image-generator/types/delete')  }}";
+        {% else %}
+            var deleteAction = null;
+        {% endif %}
+    </script>
+{% endblock %}
+
+{% js %}
+const columns = [
+    {
+        name: '__slot:title',
+        title: 'Name',
+    },
+    {
+        name: 'handle',
+        title: 'Handle'
+    },
+    {
+        name: "width",
+        title: "Width"
+    },
+    {
+        name: "height",
+        title: "Height"
+    },
+    {
+        name: "quality",
+        title: "Quality",
+    }
+];
+
+new Craft.VueAdminTable({
+    columns: columns,
+    container: '#types-admin-table',
+    tableData: tableData,
+    deleteAction:deleteAction,
+    deleteFailMessage: 'Failed to delete types.',
+    deleteSuccessMessage: 'Type deleted.',
+    emptyMessage: 'No types exist yet.',
+});
+{% endjs %}

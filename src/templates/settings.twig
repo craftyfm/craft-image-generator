@@ -1,0 +1,109 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.selectField({
+    label: "Asset Volume"|t('-image-generator'),
+    instructions: "Choose the volume where generated  images will be stored"|t('-image-generator'),
+    name: 'assetVolumeHandle',
+    value: settings.assetVolumeHandle,
+    options: craft.app.volumes.allVolumes|map(v => { label: v.name, value: v.handle }),
+    required: true
+}) }}
+
+{{ forms.textField({
+    label: "Asset Folder Path"|t('-image-generator'),
+    instructions: "Folder path within the volume (e.g., '-images')"|t('-image-generator'),
+    name: 'assetFolderPath',
+    value: settings.assetFolderPath,
+    placeholder: '-images'
+}) }}
+
+<hr>
+
+<h2>{{ "Image Settings"|t('-image-generator') }}</h2>
+
+<div class="flex">
+    {{ forms.textField({
+        label: "Image Width"|t('-image-generator'),
+        name: 'imageWidth',
+        value: settings.imageWidth,
+        type: 'number',
+        min: 1,
+        size: 6
+    }) }}
+
+    {{ forms.textField({
+        label: "Image Height"|t('-image-generator'),
+        name: 'imageHeight',
+        value: settings.imageHeight,
+        type: 'number',
+        min: 1,
+        size: 6
+    }) }}
+</div>
+
+{{ forms.selectField({
+    label: "Image Format"|t('-image-generator'),
+    name: 'imageFormat',
+    value: settings.imageFormat,
+    options: [
+        { label: 'PNG', value: 'png' },
+        { label: 'JPEG', value: 'jpg' }
+    ]
+}) }}
+
+{{ forms.textField({
+    label: "Image Quality"|t('-image-generator'),
+    instructions: "Quality for JPEG images (1-100)"|t('-image-generator'),
+    name: 'imageQuality',
+    value: settings.imageQuality,
+    type: 'number',
+    min: 1,
+    max: 100
+}) }}
+
+<hr>
+
+<h2>{{ "Template Mapping"|t('-image-generator') }}</h2>
+
+<p class="light">{{ "Map sections to their  image templates. Templates should render HTML that will be converted to an image."|t('-image-generator') }}</p>
+
+{% set sections = craft.app.sections.allSections %}
+
+<div id="template-mapping">
+    <table class="data fullwidth">
+        <thead>
+        <tr>
+            <th>{{ "Section"|t('-image-generator') }}</th>
+            <th>{{ "Template Path"|t('-image-generator') }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for section in sections %}
+            {% set currentTemplate = settings.elementTemplateMapping['craft\\elements\\Entry'][section.handle] ?? '' %}
+            <tr>
+                <td>{{ section.name }}</td>
+                <td>
+                    {{ forms.textField({
+                        name: 'elementTemplateMapping[craft\\elements\\Entry][' ~ section.handle ~ ']',
+                        value: currentTemplate,
+                        placeholder: '_/' ~ section.handle ~ '.twig'
+                    }) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<hr>
+
+<h2>{{ "Advanced Settings"|t('-image-generator') }}</h2>
+
+{{ forms.textareaField({
+    label: "Additional Browsershot Options"|t('-image-generator'),
+    instructions: "JSON object with additional Browsershot options"|t('-image-generator'),
+    name: 'browsershotOptions',
+    value: settings.browsershotOptions|json_encode,
+    rows: 4,
+    placeholder: '{"waitUntilNetworkIdle": true, "timeout": 30}'
+}) }}

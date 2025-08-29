@@ -1,0 +1,14 @@
+<?php
+
+namespace craftyfm\imagegenerator\records;
+
+use craft\db\ActiveRecord;
+use craftyfm\imagegenerator\helper\Table;
+
+class GeneratedImageRecord extends ActiveRecord
+{
+    public static function tableName(): string
+    {
+        return Table::GENERATED_IMAGE_TABLE;
+    }
+}

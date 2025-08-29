@@ -1,0 +1,121 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% set isNew = type.id == null  %}
+{% set title = isNew ? "Create a new image type"|t('image-generator') : type.name %}
+
+{% set crumbs = [
+    { label: "Image Generator"|t('image-generator'), url: url('image-generator') },
+    { label: "Types"|t('image-generator'), url: url('image-generator/types') }
+] %}
+
+{% if craft.app.config.general.allowAdminChanges %}
+    {% set readOnly = false %}
+    {% set fullPageForm = true %}
+{% else %}
+    {% set readOnly = true %}
+    {% set fullPageForm = false %}
+{% endif %}
+
+{% block content %}
+    <form method="post" action="" accept-charset="UTF-8">
+        {{ csrfInput() }}
+        {{ actionInput('image-generator/type/save') }}
+        {{ redirectInput('image-generator/types') }}
+
+        {% if not isNew %}
+            {{ hiddenInput('id', type.id) }}
+        {% endif %}
+
+        <div class="field-layout">
+            {{ forms.textField({
+                label: "Name"|t('image-generator'),
+                instructions: "What this type will be called in the CP."|t('image-generator'),
+                id: 'name',
+                name: 'name',
+                value: type.name,
+                errors:  type.getErrors('name'),
+                first: true,
+                autofocus: true,
+                required: true,
+                disabled: readOnly
+            }) }}
+
+            {{ forms.textField({
+                label: "Handle"|t('image-generator'),
+                instructions: "How you'll refer to this type in the templates."|t('image-generator'),
+                id: 'handle',
+                class: 'code',
+                name: 'handle',
+                value: type.handle,
+                errors:  type.getErrors('handle'),
+                required: true,
+                disabled: readOnly
+            }) }}
+
+            <hr>
+
+            <h2>{{ "Image Settings"|t('image-generator') }}</h2>
+
+            <div class="field">
+                <div class="heading">
+                    <label>{{ "Dimensions"|t('image-generator') }}</label>
+                    <div class="instructions">{{ "Set specific dimensions or leave empty for auto sizing."|t('image-generator') }}</div>
+                </div>
+                <div class="flex">
+                    {{ forms.text({
+                        name: 'width',
+                        value: type.width,
+                        size: 10,
+                        placeholder: 'Auto'|t('image-generator'),
+                        type: 'number',
+                        errors:  type.getErrors('width'),
+                        min: 1,
+                        disabled: readOnly
+                    }) }}
+                    <span style="margin: 0 10px; line-height: 34px;">×</span>
+                    {{ forms.text({
+                        name: 'height',
+                        value: type.height,
+                        size: 10,
+                        placeholder: 'Auto'|t('image-generator'),
+                        type: 'number',
+                        errors:  type.getErrors('height'),
+                        min: 1,
+                        disabled: readOnly
+                    }) }}
+                    <span style="margin-left: 10px; line-height: 34px;">px</span>
+                </div>
+            </div>
+
+            {% set formatErrors = type.getErrors('format') %}
+            {{ forms.selectField({
+                label: "Format"|t('image-generator'),
+                instructions: "The image format to generate."|t('image-generator'),
+                name: 'format',
+                value: type.format,
+                options: type.getFormatOptions()|map((label, key) => { 'label': label, 'value': key }),
+                errors: formatErrors,
+                required: true,
+                disabled: readOnly
+            }) }}
+
+            {{ forms.textField({
+                label: "Quality"|t('image-generator'),
+                instructions: "Image quality (1-100). Only applies to JPEG and WebP."|t('image-generator'),
+                name: 'quality',
+                value: type.quality,
+                type: 'number',
+                min: 1,
+                max: 100,
+                errors: type.getErrors('quality'),
+                size: 10,
+                disabled: readOnly
+            }) }}
+        </div>
+    </form>
+{% endblock %}
+
+{% if not type.handle %}
+    {% js "new Craft.HandleGenerator('##{'name'|namespaceInputId}', '##{'handle'|namespaceInputId}');" %}
+{% endif %}
