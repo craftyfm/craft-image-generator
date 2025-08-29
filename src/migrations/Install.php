@@ -23,6 +23,7 @@ class Install extends Migration
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull(),
             'handle' => $this->string()->notNull()->unique(),
+            'template' => $this->string()->notNull(),
             'width' => $this->integer(),
             'height' => $this->integer(),
             'format' => $this->string(10)->notNull()->defaultValue('jpg'),

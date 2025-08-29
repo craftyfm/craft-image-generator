@@ -11,6 +11,7 @@ class GeneratedImageType extends Model
     public ?int $id = null;
     public string $name = '';
     public string $handle = '';
+    public string $template = '';
     public ?int $width = null;
     public ?int $height = null;
     public string $format = 'jpg';
@@ -22,7 +23,14 @@ class GeneratedImageType extends Model
     public function rules(): array
     {
         return [
-            [['name', 'handle', 'format'], 'required'],
+            [['name', 'handle', 'format', 'template'], 'required'],
+            [['handle'], 'unique', 'targetClass' => GeneratedImageType::class,
+                'filter' => function ($query) {
+                    if ($this->id) {
+                        $query->andWhere(['not', 'id', $this->id]);
+                    }
+                },
+                'message' => 'This handle has already been taken.'],
             [['width', 'height', 'quality'], 'integer'],
             [['name', 'handle'], 'string', 'max' => 255],
             [['format'], 'string', 'max' => 10],

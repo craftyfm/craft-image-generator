@@ -11,13 +11,6 @@ use craft\validators\ArrayValidator;
  */
 class Settings extends Model
 {
-    /**
-     * @var array Mapping of element types to template paths
-     * Format: ['craft\elements\Entry' => ['sectionHandle' => 'template/path']]
-     */
-    public array $elementTemplateMapping = [
-        'craft\elements\Entry' => []
-    ];
 
     /**
      * @var string|null Asset volume handle where generated images will be stored
@@ -27,36 +20,17 @@ class Settings extends Model
     /**
      * @var string|null Folder path within the asset volume
      */
-    public ?string $assetFolderPath = '-images';
+    public ?string $assetFolderPath = 'generated-images';
 
-    public string $imageFormat = 'jpg';
-
-    public int $imageQuality = 90;
-
-    /**
-     * @var array Additional Browsershot options
-     */
-    public array $browsershotOptions = [];
-
-    public function behaviors(): array
-    {
-        $behaviors = parent::behaviors();
-        $behaviors['parser'] = [
-            'class' => EnvAttributeParserBehavior::class,
-            'attributes' => [
-                'assetVolumeHandle',
-                'assetFolderPath',
-            ],
-        ];
-        return $behaviors;
-    }
+    public ?string $nodePath = null;
+    public ?string $npmPath = null;
+    public ?string $chromePath = null;
 
     public function rules(): array
     {
         return [
             [['elementTemplateMapping'], ArrayValidator::class],
             [['assetVolumeHandle', 'assetFolderPath'], 'string'],
-            [['browsershotOptions'], ArrayValidator::class],
         ];
     }
 
@@ -66,7 +40,6 @@ class Settings extends Model
             'elementTemplateMapping' => 'Element Template Mapping',
             'assetVolumeHandle' => 'Asset Volume',
             'assetFolderPath' => 'Asset Folder Path',
-            'browsershotOptions' => 'Browsershot Options',
         ];
     }
 }

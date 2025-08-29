@@ -53,6 +53,18 @@
                 disabled: readOnly
             }) }}
 
+            {{ forms.autosuggestField({
+                label: "Template"|t('image-generator'),
+                instructions: "The template form will use for generate image"|t('image-generator'),
+                id: 'template',
+                name: 'template',
+                suggestTemplates: true,
+                required: true,
+                value: type.template,
+                errors: type.getErrors('template'),
+                disabled: readOnly,
+            }) }}
+
             <hr>
 
             <h2>{{ "Image Settings"|t('image-generator') }}</h2>
