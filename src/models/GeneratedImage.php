@@ -4,7 +4,10 @@ namespace craftyfm\imagegenerator\models;
 
 use craft\base\Model;
 use craft\elements\Asset;
+use craft\helpers\UrlHelper;
+use craftyfm\imagegenerator\Plugin;
 use DateTime;
+use RuntimeException;
 use yii\base\InvalidConfigException;
 
 class GeneratedImage extends Model
@@ -18,6 +21,7 @@ class GeneratedImage extends Model
     public ?string $uid = null;
 
     private ?Asset $_asset;
+    private ?GeneratedImageType $_type;
     public function getAsset(): ?Asset
     {
         if (isset($this->_asset)) {
@@ -42,17 +46,29 @@ class GeneratedImage extends Model
      */
     public function getUrl(): string
     {
-        $asset = $this->getAsset();
-        if (!$asset) {
-            return '';
+        if (!$this->id || !$this->getAsset()) {
+            throw new RuntimeException("Generated Image doesn't have id or asset.");
+        }
+        return $this->getAsset()->getUrl();
+    }
+
+    public function getType(): ?GeneratedImageType
+    {
+        if (isset($this->_type)) {
+            return $this->_type;
+        }
+        if (!isset($this->typeId)) {
+            return null;
         }
 
-        return $asset->getUrl();
+        $this->_type = Plugin::getInstance()->typeService->getTypeById($this->typeId);
+        return $this->_type;
     }
+
     public function rules(): array
     {
         return [
-            [['elementId', 'typeId'], 'required'],
+            [['elementId', 'typeId', 'assetId'], 'required'],
             [['assetId', 'elementId', 'typeId'], 'integer'],
         ];
     }

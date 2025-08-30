@@ -38,7 +38,7 @@ class Install extends Migration
          */
         $this->createTable(Table::GENERATED_IMAGE_TABLE, [
             'id' => $this->primaryKey(),
-            'assetId' => $this->integer(),
+            'assetId' => $this->integer()->notNull(),
             'elementId' => $this->integer()->notNull(),
             'typeId' => $this->integer()->notNull(),
             'dateCreated' => $this->dateTime()->notNull(),
@@ -50,7 +50,12 @@ class Install extends Migration
         $this->createIndex(null, Table::GENERATED_IMAGE_TABLE, ['assetId'], false);
         $this->createIndex(null, Table::GENERATED_IMAGE_TABLE, ['elementId'], false);
         $this->createIndex(null, Table::GENERATED_IMAGE_TABLE, ['typeId'], false);
-
+        $this->createIndex(
+            null,
+            Table::GENERATED_IMAGE_TABLE,
+            ['elementId', 'typeId'],
+            true // unique = true
+        );
         // Foreign Keys for generatedimages
         $this->addForeignKey(
             null,

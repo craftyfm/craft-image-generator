@@ -10,6 +10,7 @@ use craft\errors\VolumeException;
 use craft\feedme\helpers\AssetHelper;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
+use craft\helpers\UrlHelper;
 use craft\web\View;
 use craftyfm\imagegenerator\models\GeneratedImage;
 use craftyfm\imagegenerator\models\GeneratedImageType;
@@ -160,6 +161,13 @@ class ImageService extends Component
         return $generatedImage;
     }
 
+    public function getGenerateUrl(int $elementId, int $typeId ): string
+    {
+        return UrlHelper::actionUrl('image-generator/image/generate', [
+            'elementId' => $elementId,
+            'typeId' => $typeId,
+        ]);
+    }
     /**
      * @throws \yii\base\Exception
      * @throws ErrorException
@@ -192,6 +200,7 @@ class ImageService extends Component
         }
         return $asset;
     }
+
 
     private function generateFilename(string $format, Element $element): string
     {
