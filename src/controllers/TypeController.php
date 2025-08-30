@@ -92,6 +92,7 @@ class TypeController extends Controller
         $type->height = $request->getBodyParam('height');
         $type->format = $request->getBodyParam('format', 'jpg');
         $type->quality = (int)$request->getBodyParam('quality', 80);
+        $type->template = $request->getBodyParam('template');
 
 
         // Save the type

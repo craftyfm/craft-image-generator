@@ -51,7 +51,7 @@ class ElementImageBehavior extends Behavior
      */
     public function removeImage(): bool
     {
-        $result = Plugin::getInstance()->ImageService->removeImageForElement($this->owner);
+        $result = Plugin::getInstance()->imageService->removeImageForElement($this->owner);
         if ($result) {
             $this->_Image = null;
         }

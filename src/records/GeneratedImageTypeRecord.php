@@ -6,13 +6,14 @@ use craft\db\ActiveRecord;
 use craftyfm\imagegenerator\helper\Table;
 
 /**
- * @property mixed|null $handle
- * @property mixed|null $width
- * @property mixed|null $height
- * @property mixed|null $format
- * @property mixed|null $quality
- * @property mixed|null $name
- * @property mixed|null $id
+ * @property string $handle
+ * @property int $width
+ * @property int $height
+ * @property string $format
+ * @property int $quality
+ * @property string $name
+ * @property int $id
+ * @property string $template
  */
 class GeneratedImageTypeRecord extends ActiveRecord
 {

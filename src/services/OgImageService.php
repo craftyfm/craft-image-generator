@@ -235,10 +235,7 @@ class OgImageService extends Component
     {
         try {
             // Get volume
-            $volume = Craft::$app->volumes->getVolumeByHandle($settings->assetVolumeHandle);
-            if (!$volume) {
-                throw new NotFoundHttpException("Volume not found: {$settings->assetVolumeHandle}");
-            }
+
 
             // Create temp file
             $tempPath = Craft::$app->path->getTempPath() . '/' . uniqid() . '.' . $settings->imageFormat;

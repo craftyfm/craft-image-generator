@@ -38,7 +38,7 @@ class Install extends Migration
          */
         $this->createTable(Table::GENERATED_IMAGE_TABLE, [
             'id' => $this->primaryKey(),
-            'assetId' => $this->integer()->notNull(),
+            'assetId' => $this->integer(),
             'elementId' => $this->integer()->notNull(),
             'typeId' => $this->integer()->notNull(),
             'dateCreated' => $this->dateTime()->notNull(),

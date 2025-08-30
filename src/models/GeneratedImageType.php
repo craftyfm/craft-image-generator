@@ -4,6 +4,7 @@ namespace craftyfm\imagegenerator\models;
 
 use craft\base\Model;
 use craft\helpers\UrlHelper;
+use craftyfm\imagegenerator\records\GeneratedImageTypeRecord;
 use DateTime;
 
 class GeneratedImageType extends Model
@@ -24,7 +25,7 @@ class GeneratedImageType extends Model
     {
         return [
             [['name', 'handle', 'format', 'template'], 'required'],
-            [['handle'], 'unique', 'targetClass' => GeneratedImageType::class,
+            [['handle'], 'unique', 'targetClass' => GeneratedImageTypeRecord::class,
                 'filter' => function ($query) {
                     if ($this->id) {
                         $query->andWhere(['not', 'id', $this->id]);

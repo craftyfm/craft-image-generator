@@ -1,7 +1,7 @@
 {% import "_includes/forms" as forms %}
 
 {{ forms.selectField({
-    label: "Asset Volume"|t('-image-generator'),
+    label: "Asset Volume"|t('image-generator'),
     instructions: "Choose the volume where generated  images will be stored"|t('-image-generator'),
     name: 'assetVolumeHandle',
     value: settings.assetVolumeHandle,
@@ -10,7 +10,7 @@
 }) }}
 
 {{ forms.textField({
-    label: "Asset Folder Path"|t('-image-generator'),
+    label: "Asset Folder Path"|t('image-generator'),
     instructions: "Folder path within the volume (e.g., '-images')"|t('-image-generator'),
     name: 'assetFolderPath',
     value: settings.assetFolderPath,

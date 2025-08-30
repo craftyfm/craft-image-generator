@@ -11,11 +11,13 @@ use craft\events\DefineBehaviorsEvent;
 use craft\events\ModelEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\helpers\ElementHelper;
+use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craftyfm\imagegenerator\behaviors\ElementImageBehavior;
 use craftyfm\imagegenerator\models\Settings;
 use craftyfm\imagegenerator\services\ImageService;
 use craftyfm\imagegenerator\services\TypeService;
+use craftyfm\imagegenerator\variables\ImageGenerator;
 use yii\base\Event;
 
 /**
@@ -86,29 +88,25 @@ class Plugin extends BasePlugin
 
     private function attachEventHandlers(): void
     {
-        // Attach behavior to Entry elements
+//        // Attach behavior to Entry elements
+//        Event::on(
+//            Entry::class,
+//            Model::EVENT_DEFINE_BEHAVIORS,
+//            function(DefineBehaviorsEvent $event) {
+//                $event->behaviors['Image'] = ElementImageBehavior::class;
+//            }
+//        );
+
+
         Event::on(
-            Entry::class,
-            Model::EVENT_DEFINE_BEHAVIORS,
-            function(DefineBehaviorsEvent $event) {
-                $event->behaviors['Image'] = ElementImageBehavior::class;
-            }
-        );
+            CraftVariable::class,
+            CraftVariable::EVENT_INIT,
+            function(Event $e) {
+                /** @var CraftVariable $variable */
+                $variable = $e->sender;
 
-        // Auto-generate image on entry save
-        Event::on(
-            Entry::class,
-            Element::EVENT_AFTER_SAVE,
-            function(ModelEvent $event) {
-                /** @var Entry $entry */
-                $entry = $event->sender;
-
-                if (ElementHelper::isDraftOrRevision($entry)) {
-                    return;
-                }
-
-                // Only generate for new entries or if no image exists
-                $this->imageService->generateImage($entry);
+                // Attach a service:
+                $variable->set('imageGenerator', ImageGenerator::class);
             }
         );
     }

@@ -118,6 +118,7 @@ class TypeService extends Component
         $record->height = $data['height'] ?? null;
         $record->format = $data['format'];
         $record->quality = $data['quality'];
+        $record->template = $data['template'];
         $record->uid = $uid;
 
         $record->save(false);
@@ -162,6 +163,7 @@ class TypeService extends Component
             'height' => $type->height,
             'format' => $type->format,
             'quality' => $type->quality,
+            'template' => $type->template,
         ];
     }
 }
