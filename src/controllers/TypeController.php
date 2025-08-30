@@ -7,7 +7,7 @@ use craft\errors\BusyResourceException;
 use craft\errors\MissingComponentException;
 use craft\errors\StaleResourceException;
 use craft\web\Controller;
-use craftyfm\imagegenerator\models\GeneratedImageType;
+use craftyfm\imagegenerator\models\ImageType;
 use craftyfm\imagegenerator\Plugin;
 use craftyfm\imagegenerator\services\TypeService;
 use yii\base\ErrorException;
@@ -48,11 +48,11 @@ class TypeController extends Controller
     /**
      * @throws NotFoundHttpException
      */
-    public function actionEdit(int $id = null, GeneratedImageType $type = null): Response
+    public function actionEdit(int $id = null, ImageType $type = null): Response
     {
 
         if (!$type) {
-            $type = $id !== null ? Plugin::getInstance()->typeService->getTypeById($id) : new GeneratedImageType();
+            $type = $id !== null ? Plugin::getInstance()->typeService->getTypeById($id) : new ImageType();
         }
 
         if (!$type) {
@@ -82,7 +82,7 @@ class TypeController extends Controller
         $this->requirePostRequest();
 
         $request = Craft::$app->getRequest();
-        $type = new GeneratedImageType();
+        $type = new ImageType();
 
         // Populate the model
         $type->id = $request->getBodyParam('id') ?? null;

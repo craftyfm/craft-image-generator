@@ -12,12 +12,12 @@ use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\web\View;
-use craftyfm\imagegenerator\models\GeneratedImage;
-use craftyfm\imagegenerator\models\GeneratedImageType;
+use craftyfm\imagegenerator\models\Image;
+use craftyfm\imagegenerator\models\ImageType;
 use craftyfm\imagegenerator\models\Settings;
 use craftyfm\imagegenerator\Plugin;
-use craftyfm\imagegenerator\records\GeneratedImageRecord;
-use craftyfm\imagegenerator\records\GeneratedImageTypeRecord;
+use craftyfm\imagegenerator\records\ImageRecord;
+use craftyfm\imagegenerator\records\ImageTypeRecord;
 use RuntimeException;
 use Spatie\Browsershot\Browsershot;
 use Throwable;
@@ -32,56 +32,56 @@ use yii\web\NotFoundHttpException;
 class ImageService extends Component
 {
 
-    public function getImageById(int $id): ?GeneratedImage
+    public function getImageById(int $id): ?Image
     {
-        $record = GeneratedImageRecord::findOne(['id' => $id]);
+        $record = ImageRecord::findOne(['id' => $id]);
         if (!$record) {
             return null;
         }
-        return new GeneratedImage($record->toArray());
+        return new Image($record->toArray());
     }
 
-    public function getImageByTypeId(int $typeId, int $elementId): ?GeneratedImage
+    public function getImageByTypeId(int $typeId, int $elementId): ?Image
     {
-        $record = GeneratedImageRecord::findOne([
+        $record = ImageRecord::findOne([
             'typeId' => $typeId,
             'elementId' => $elementId
         ]);
         if (!$record) {
             return null;
         }
-        return new GeneratedImage($record->toArray());
+        return new Image($record->toArray());
     }
 
-    public function getImageByTypeHandle(string $typeHandle, int $elementId): ?GeneratedImage
+    public function getImageByTypeHandle(string $typeHandle, int $elementId): ?Image
     {
-        $record = GeneratedImageRecord::find()
+        $record = ImageRecord::find()
             ->innerJoin(
-                GeneratedImageTypeRecord::tableName() . ' t',
-                't.id = ' . GeneratedImageRecord::tableName() . '.typeId'
+                ImageTypeRecord::tableName() . ' t',
+                't.id = ' . ImageRecord::tableName() . '.typeId'
             )
             ->where([
                 't.handle' => $typeHandle,
-                GeneratedImageRecord::tableName() . '.elementId' => $elementId,
+                ImageRecord::tableName() . '.elementId' => $elementId,
             ])
             ->one();
 
-        return $record ? new GeneratedImage($record->toArray()) : null;
+        return $record ? new Image($record->toArray()) : null;
     }
 
     /**
      * @throws Exception
      */
-    public function saveGeneratedImage(GeneratedImage $image, bool $runValidation = true): bool
+    public function saveGeneratedImage(Image $image, bool $runValidation = true): bool
     {
         if ($runValidation && !$image->validate()) {
             return false;
         }
 
         if ($image->id === null) {
-            $record = new GeneratedImageRecord();
+            $record = new ImageRecord();
         } else {
-            $record = GeneratedImageRecord::findOne($image->id);
+            $record = ImageRecord::findOne($image->id);
         }
 
         $record->assetId = $image->assetId;
@@ -98,7 +98,7 @@ class ImageService extends Component
      */
     public function deleteGeneratedImage(int $id): bool
     {
-        $record = GeneratedImageRecord::findOne(['id' => $id]);
+        $record = ImageRecord::findOne(['id' => $id]);
         if (!$record) {
             return true;
         }
@@ -111,6 +111,7 @@ class ImageService extends Component
         return $record?->delete();
     }
 
+
     /**
      * @throws RuntimeError
      * @throws LoaderError
@@ -121,21 +122,14 @@ class ImageService extends Component
      * @throws \yii\base\Exception
      * @throws Throwable
      */
-    public function generateImage(Element $element, GeneratedImageType $type): GeneratedImage
+    public function generateImage(Image $image): void
     {
         $settings = Plugin::getInstance()->getSettings();
 
-        //check if the element has generated image with current type or not.
-        $generatedImage = $this->getImageByTypeId($type->id, $element->id);
+        $type = $image->getType();
+        $element = $image->getElement();
 
-        if (!$generatedImage) {
-            $generatedImage = new GeneratedImage(
-                [
-                    'elementId' => $element->id,
-                    'typeId' => $type->id,
-                ]
-            );
-        }
+
         try {
             $html = Craft::$app->getView()->renderTemplate(
                 $type->template, ['element' => $element], View::TEMPLATE_MODE_SITE
@@ -149,23 +143,20 @@ class ImageService extends Component
             }
             $folder = Craft::$app->getAssets()->ensureFolderByFullPathAndVolume($settings->assetFolderPath, $volume);
 
-            $asset = $this->saveAssetFromImageData($imageData, $filename, $volume->id, $folder->id, $generatedImage->assetId);
+            $asset = $this->saveAssetFromImageData($imageData, $filename, $volume->id, $folder->id, $image->assetId);
 
-            $generatedImage->setAsset($asset);
-            $this->saveGeneratedImage($generatedImage);
+            $image->setAsset($asset);
+            $this->saveGeneratedImage($image);
         } catch (\Exception|Throwable $e) {
             Craft::error("Failed to generate image with element id: " . $element->id . 'and type: ' . $type->handle . ' with reasons: ' .$e->getMessage(), __METHOD__);
             throw $e;
         }
-
-        return $generatedImage;
     }
 
-    public function getGenerateUrl(int $elementId, int $typeId ): string
+    public function getGenerateUrl(int $generatedImageId): string
     {
         return UrlHelper::actionUrl('image-generator/image/generate', [
-            'elementId' => $elementId,
-            'typeId' => $typeId,
+            'id' => $generatedImageId,
         ]);
     }
     /**
@@ -207,7 +198,7 @@ class ImageService extends Component
         $slug = $element->id . '-' . ($element->slug ?? StringHelper::toKebabCase($element->title ?? '-image'));
         return "ig-$slug.$format";
     }
-    private function generateImageFromHtml(string $html, GeneratedImageType $type): ?string
+    private function generateImageFromHtml(string $html, ImageType $type): ?string
     {
         $settings = Plugin::getInstance()->getSettings();
         $browsershot = Browsershot::html($html)

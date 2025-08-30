@@ -18,7 +18,11 @@ use craftyfm\imagegenerator\models\Settings;
 use craftyfm\imagegenerator\services\ImageService;
 use craftyfm\imagegenerator\services\TypeService;
 use craftyfm\imagegenerator\variables\ImageGenerator;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use yii\base\Event;
+use yii\base\Exception;
 
 /**
  *  Image Generator plugin
@@ -66,8 +70,8 @@ class Plugin extends BasePlugin
         $item['label'] = 'Image Generator';
         $item['url'] = 'image-generator';
         $item['subnav'] = [
-            'types' => ['label' => 'Types', 'url' => 'image-generator/types'],
             'images' => ['label' => 'Images', 'url' => 'image-generator/images'],
+            'types' => ['label' => 'Types', 'url' => 'image-generator/types'],
         ];
 
         return $item;
@@ -78,6 +82,12 @@ class Plugin extends BasePlugin
         return new Settings();
     }
 
+    /**
+     * @throws SyntaxError
+     * @throws Exception
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
     protected function settingsHtml(): ?string
     {
         return Craft::$app->view->renderTemplate('image-generator/settings', [
@@ -122,7 +132,9 @@ class Plugin extends BasePlugin
                 $event->rules['image-generator/bulk-generate'] = 'image-generator/image/bulk-generate';
                 
                 // Type routes
-                $event->rules['image-generator'] = 'image-generator/type/index';
+                $event->rules['image-generator'] = 'image-generator/image/index';
+                $event->rules['image-generator/images'] = 'image-generator/image/index';
+
                 $event->rules['image-generator/types'] = 'image-generator/type/index';
                 $event->rules['image-generator/types/new'] = 'image-generator/type/edit';
                 $event->rules['image-generator/types/<id:\\d+>'] = 'image-generator/type/edit';

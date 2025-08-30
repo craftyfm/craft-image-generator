@@ -4,10 +4,10 @@ namespace craftyfm\imagegenerator\models;
 
 use craft\base\Model;
 use craft\helpers\UrlHelper;
-use craftyfm\imagegenerator\records\GeneratedImageTypeRecord;
+use craftyfm\imagegenerator\records\ImageTypeRecord;
 use DateTime;
 
-class GeneratedImageType extends Model
+class ImageType extends Model
 {
     public ?int $id = null;
     public string $name = '';
@@ -19,16 +19,16 @@ class GeneratedImageType extends Model
     public int $quality = 80;
     public ?DateTime $dateCreated = null;
     public ?DateTime $dateUpdated = null;
-    public string $uid;
+    public ?string $uid = null;
 
     public function rules(): array
     {
         return [
             [['name', 'handle', 'format', 'template'], 'required'],
-            [['handle'], 'unique', 'targetClass' => GeneratedImageTypeRecord::class,
+            [['handle'], 'unique', 'targetClass' => ImageTypeRecord::class,
                 'filter' => function ($query) {
                     if ($this->id) {
-                        $query->andWhere(['not', 'id', $this->id]);
+                        $query->andWhere(['<>', 'id', $this->id]);
                     }
                 },
                 'message' => 'This handle has already been taken.'],

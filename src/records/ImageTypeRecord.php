@@ -15,7 +15,7 @@ use craftyfm\imagegenerator\helper\Table;
  * @property int $id
  * @property string $template
  */
-class GeneratedImageTypeRecord extends ActiveRecord
+class ImageTypeRecord extends ActiveRecord
 {
 
     public static function tableName(): string

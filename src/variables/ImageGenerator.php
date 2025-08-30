@@ -4,8 +4,9 @@ namespace craftyfm\imagegenerator\variables;
 
 use craft\base\Element;
 use craft\errors\VolumeException;
-use craftyfm\imagegenerator\models\GeneratedImage;
+use craftyfm\imagegenerator\models\Image;
 use craftyfm\imagegenerator\Plugin;
+use RuntimeException;
 use Throwable;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -22,6 +23,7 @@ class ImageGenerator
      * @param Element $element
      * @return string
      * @throws InvalidConfigException
+     * @throws Exception
      */
     public function getUrl(string $typeHandle, Element $element): string
     {
@@ -30,7 +32,17 @@ class ImageGenerator
 
         if (!$generatedImage) {
             $type = Plugin::getInstance()->typeService->getTypeByHandle($typeHandle);
-            return $imageService->getGenerateUrl($element->id, $type->id);
+            if(!$type) {
+                throw new RuntimeException("Image Generator: Type not found");
+            }
+            $generatedImage = new Image([
+                'elementId' => $element->id,
+                'typeId' => $type->id,
+            ]);
+            if(!$imageService->saveGeneratedImage($generatedImage)) {
+                throw new RuntimeException("Failed to create generated image");
+            }
+            return $imageService->getGenerateUrl($generatedImage->id);
         }
 
         return $generatedImage->getUrl();

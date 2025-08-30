@@ -12,8 +12,8 @@ use craft\helpers\Db;
 use craft\helpers\ProjectConfig as ProjectConfigHelper;
 use craft\helpers\StringHelper;
 use craftyfm\imagegenerator\helper\Table;
-use craftyfm\imagegenerator\models\GeneratedImageType;
-use craftyfm\imagegenerator\records\GeneratedImageTypeRecord;
+use craftyfm\imagegenerator\models\ImageType;
+use craftyfm\imagegenerator\records\ImageTypeRecord;
 use DateTime;
 use yii\base\ErrorException;
 use yii\base\Exception;
@@ -28,35 +28,35 @@ class TypeService extends Component
 
 
     /**
-     * @return GeneratedImageType[]
+     * @return ImageType[]
      */
     public function getAllTypes(): array
     {
-        $records = GeneratedImageTypeRecord::find()->all();
+        $records = ImageTypeRecord::find()->all();
         $models = [];
         foreach ($records as $record) {
-            $models[] = new GeneratedImageType($record->toArray());
+            $models[] = new ImageType($record->toArray());
 
         }
         return $models;
     }
 
-    public function getTypeById(int $id): ?GeneratedImageType
+    public function getTypeById(int $id): ?ImageType
     {
-        $record = GeneratedImageTypeRecord::findOne(['id' => $id]);
+        $record = ImageTypeRecord::findOne(['id' => $id]);
         if (!$record) {
             return null;
         }
-        return new GeneratedImageType($record->toArray());
+        return new ImageType($record->toArray());
     }
 
-    public function getTypeByHandle(string $handle): ?GeneratedImageType
+    public function getTypeByHandle(string $handle): ?ImageType
     {
-        $record = GeneratedImageTypeRecord::findOne(['handle' => $handle]);
+        $record = ImageTypeRecord::findOne(['handle' => $handle]);
         if (!$record) {
             return null;
         }
-        return new GeneratedImageType($record->toArray());
+        return new ImageType($record->toArray());
     }
 
     /**
@@ -69,7 +69,7 @@ class TypeService extends Component
      * @throws Exception
      * @throws \Exception
      */
-    public function saveType(GeneratedImageType $type, bool $runValidation = true): bool
+    public function saveType(ImageType $type, bool $runValidation = true): bool
     {
         $isNewType = !$type->id;
 
@@ -106,10 +106,10 @@ class TypeService extends Component
         $uid = $event->tokenMatches[0];
         $data = $event->newValue;
 
-        $record = GeneratedImageTypeRecord::findOne(['uid' => $uid]);
+        $record = ImageTypeRecord::findOne(['uid' => $uid]);
         if (!$record) {
             $isNewType = true;
-            $record = new GeneratedImageTypeRecord();
+            $record = new ImageTypeRecord();
         }
 
         $record->name = $data['name'];
@@ -135,7 +135,7 @@ class TypeService extends Component
         return $this->deleteType($type);
     }
 
-    public function deleteType(GeneratedImageType $type): bool
+    public function deleteType(ImageType $type): bool
     {
         $uid = $type->uid;
         Craft::$app->projectConfig->remove(self::CONFIG_TYPE_KEY . '.' . $uid);
@@ -150,11 +150,11 @@ class TypeService extends Component
     {
         $uid = $event->tokenMatches[0];
 
-        $record = GeneratedImageTypeRecord::findOne(['uid' => $uid]);
+        $record = ImageTypeRecord::findOne(['uid' => $uid]);
         $record?->delete();
     }
 
-    private function _getTypeConfig(GeneratedImageType $type): array
+    private function _getTypeConfig(ImageType $type): array
     {
         return [
             'name' => $type->name,
