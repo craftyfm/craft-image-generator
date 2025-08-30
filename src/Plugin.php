@@ -8,8 +8,10 @@ use craft\base\Element;
 use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
 use craft\elements\Asset;
+use craft\elements\Category;
 use craft\elements\Entry;
 use craft\events\DefineBehaviorsEvent;
+use craft\events\DefineHtmlEvent;
 use craft\events\ModelEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\helpers\ElementHelper;
@@ -154,6 +156,27 @@ class Plugin extends BasePlugin
                 $variable->set('imageGenerator', ImageGenerator::class);
             }
         );
+
+        Event::on(
+            Element::class,
+            Element::EVENT_DEFINE_SIDEBAR_HTML,
+            static function(DefineHtmlEvent $event) {
+
+                /** @var Element $element */
+                $element = $event->sender;
+                if (ElementHelper::isDraftOrRevision($element)) {
+                    $mainElement = $element->getCanonical();
+                } else {
+                    $mainElement = $element;
+                }
+                $generatedImages = Plugin::getInstance()->imageService->getImagesForElement($mainElement);
+
+                $html = Craft::$app->view->renderTemplate('image-generator/_cp/element-sidebar', [
+                    'images' => $generatedImages,
+                ]);
+                $event->html .= $html;
+
+            });
     }
 
     private function registerCpRoutes(): void

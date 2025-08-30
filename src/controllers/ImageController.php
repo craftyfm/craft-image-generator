@@ -3,10 +3,16 @@
 namespace craftyfm\imagegenerator\controllers;
 
 use Craft;
+use craft\errors\VolumeException;
 use craft\web\Controller;
 use craftyfm\imagegenerator\Plugin;
 use Throwable;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use yii\base\ErrorException;
 use yii\base\InvalidConfigException;
+use yii\db\Exception;
 use yii\db\StaleObjectException;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
@@ -43,6 +49,29 @@ class ImageController extends Controller
             'data' => $tableData,
         ]);
     }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
+     */
+    public function actionRegenerate(): Response
+    {
+        $id = $this->request->getRequiredBodyParam('id');
+        $generatedImage = Plugin::getInstance()->imageService->getImageById($id);
+
+        if (!$generatedImage) {
+            throw new NotFoundHttpException('Image not found');
+        }
+
+        try {
+            Plugin::getInstance()->imageService->generateImage($generatedImage);
+            return $this->asSuccess();
+        } catch (\Exception|Throwable $e) {
+            return $this->asFailure("Failed to generate image");
+        }
+
+    }
+
 
     /**
      * @throws BadRequestHttpException

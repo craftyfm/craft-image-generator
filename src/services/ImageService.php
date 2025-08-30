@@ -72,6 +72,20 @@ class ImageService extends Component
         return $record ? new Image($record->toArray()) : null;
     }
 
+    /**
+     * @return Image[]
+     */
+    public function getImagesForElement(Element $element): array
+    {
+        $records = ImageRecord::find()->where(['elementId' => $element->id])->all();
+        $images = [];
+        foreach ($records as $record) {
+            $image = new Image($record->toArray());
+            $image->setElement($element);
+            $images[] = $image;
+        }
+        return $images;
+    }
     public function getTableData(int $page, int $limit, int $type = null): array
     {
         $offset = ($page - 1) * $limit;
