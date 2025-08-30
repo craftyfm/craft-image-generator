@@ -1,0 +1,72 @@
+{% requireAdmin false %}
+
+{% extends "_layouts/cp" %}
+{% set title = "Generated Images"|t('app') %}
+
+{% set readOnly = not craft.app.config.general.allowAdminChanges %}
+
+{% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') -%}
+
+
+{% set crumbs = [
+    { label: "Generated Images"|t('app'), url: cpUrl('image-generator') }
+] %}
+
+{% set emptyMessage = "No imagaes exist yet."|t('app') %}
+
+{% block content %}
+    <div id="types-admin-table"></div>
+    <script>
+        var tableDataEndpoint = "{{ actionUrl('image-generator/image/table-data') }}";
+        var deleteAction = "{{ actionUrl('image-generator/image/delete') }}";
+    </script>
+{% endblock %}
+
+{% js %}
+
+const columns = [
+    { name: 'id', title: "id" },
+    {
+        name: 'asset',
+        title: "Asset",
+        callback: (value) => {
+            if (!value) {
+                return "-";
+            }
+            return `<a href="${value.url}" target="_blank">${value.title}</a>`;
+        }
+    },
+    {
+        name: 'element',
+        title: "Element",
+        callback: (value) => {
+            if (!value) {
+                return null;
+            }
+            return `<a href="${value.url}" target="_blank">${value.title}</a>`;
+        }
+    },
+    {
+        name: 'type',
+        title: "Type",
+        callback: (value) => {
+            if (!value) {
+                return null;
+            }
+            return `<a href="${value.url}" target="_blank">${value.title}</a>`;
+        }
+    },
+];
+
+
+
+new Craft.VueAdminTable({
+    columns: columns,
+    container: '#types-admin-table',
+    tableDataEndpoint: tableDataEndpoint,
+    deleteAction:deleteAction,
+    deleteFailMessage: 'Failed to delete types.',
+    deleteSuccessMessage: 'Type deleted.',
+    emptyMessage: 'No types exist yet.',
+});
+{% endjs %}

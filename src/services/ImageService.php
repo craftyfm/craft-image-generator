@@ -8,10 +8,12 @@ use craft\base\Element;
 use craft\elements\Asset;
 use craft\errors\VolumeException;
 use craft\feedme\helpers\AssetHelper;
+use craft\helpers\AdminTable;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\web\View;
+use craftyfm\imagegenerator\jobs\DeleteImagesForElementJob;
 use craftyfm\imagegenerator\models\Image;
 use craftyfm\imagegenerator\models\ImageType;
 use craftyfm\imagegenerator\models\Settings;
@@ -32,6 +34,7 @@ use yii\web\NotFoundHttpException;
 class ImageService extends Component
 {
 
+    private bool $_onDeletingAsset = false;
     public function getImageById(int $id): ?Image
     {
         $record = ImageRecord::findOne(['id' => $id]);
@@ -69,6 +72,77 @@ class ImageService extends Component
         return $record ? new Image($record->toArray()) : null;
     }
 
+    public function getTableData(int $page, int $limit): array
+    {
+        $offset = ($page - 1) * $limit;
+        /** @var ImageRecord[] $records */
+        $records = ImageRecord::find()->offset($offset)->limit($limit)->orderBy(['id' => SORT_DESC])->all();
+        $total = ImageRecord::find()->count();
+
+        // Index by ID
+        $elementMap = [];
+        $typeMap = [];
+        $assetMap = [];
+
+        // Collect element IDs
+        $elementIds = array_filter(array_column($records, 'elementId'));
+        $assetIds = array_filter(array_column($records, 'assetId'));
+
+        $elementTypes = Craft::$app->elements->getElementTypesByIds($elementIds);
+        $elements = [];
+
+        foreach ($elementTypes as $type) {
+            $elements = array_merge($elements, Craft::$app->elements->createElementQuery($type)->id($elementIds)->all());
+        }
+
+        $types = Plugin::getInstance()->typeService->getAllTypes();
+        $assets = Asset::find()->id($assetIds)->all();
+
+
+        foreach ($elements as $el) {
+            $elementMap[$el->id] = $el;
+        }
+
+        foreach ($types as $type) {
+            $typeMap[$type->id] = $type;
+        }
+
+        foreach ($assets as $asset) {
+            $assetMap[$asset->id] = $asset;
+        }
+
+
+        $tableData = [];
+        foreach ($records as $record) {
+            $tableData[] = [
+                'id' => $record->id,
+
+                'type' => isset($typeMap[$record->typeId])
+                    ? [
+                        'title' => $typeMap[$record->typeId]->name,
+                        'url'   => $typeMap[$record->typeId]->getCpEditUrl(),
+                    ]
+                    : null,
+
+                'element' => isset($elementMap[$record->elementId])
+                    ? [
+                        'title' => $elementMap[$record->elementId]->title,
+                        'url'   => $elementMap[$record->elementId]->getCpEditUrl(),
+                    ]
+                    : null,
+
+                'asset' => isset($assetMap[$record->assetId])
+                    ? [
+                        'title' => $assetMap[$record->assetId]->title,
+                        'url'   => $assetMap[$record->assetId]->getCpEditUrl(),
+                    ]
+                    : null,
+            ];
+        }
+
+        $pagination = AdminTable::paginationLinks($page, $total, $limit);
+        return [$pagination, $tableData];
+    }
     /**
      * @throws Exception
      */
@@ -102,15 +176,52 @@ class ImageService extends Component
         if (!$record) {
             return true;
         }
-        if ($record->assetId) {
-            $asset = Asset::find()->id($id)->one();
-            if (!$asset) {
+        $assetId = $record->assetId;
+        if ($assetId) {
+            $asset = Asset::find()->id($assetId)->one();
+            if ($asset) {
+                $this->_onDeletingAsset = true;
                 Craft::$app->getElements()->deleteElement($asset);
             }
         }
+        $this->_onDeletingAsset = false;
         return $record?->delete();
     }
 
+    public function handleOnDeleteAsset(Asset $asset): void
+    {
+        if ($this->_onDeletingAsset) {
+            return;
+        }
+        ImageRecord::deleteAll(['assetId' => $asset->id]);
+    }
+
+    public function handleOnDeleteElement(Element $element): void
+    {
+        Craft::$app->queue->push(new DeleteImagesForElementJob([
+            'elementId' => $element->id,
+        ]));
+    }
+
+
+    public function deleteImageForElement(int $elementId): void
+    {
+        $this->_onDeletingAsset = true;
+        $transaction = Craft::$app->getDb()->beginTransaction();
+        try{
+            $assetIds = ImageRecord::find()->where(['elementId' => $elementId])->select('assetId')->column();
+            $assets = Asset::find()->id($assetIds)->all();
+            foreach ($assets as $asset) {
+                Craft::$app->getElements()->deleteElement($asset);
+            }
+            ImageRecord::deleteAll(['elementId' => $elementId]);
+            $transaction->commit();
+        }catch (\Exception| Throwable $e){
+            Craft::error("Failed to delete images for id: {$elementId} : {$e->getMessage()}", __METHOD__);
+            $transaction->rollBack();
+        }
+        $this->_onDeletingAsset = false;
+    }
 
     /**
      * @throws RuntimeError
@@ -141,7 +252,9 @@ class ImageService extends Component
             if (!$volume) {
                 throw new RuntimeException("Volume not found: {$settings->assetVolumeHandle}");
             }
-            $folder = Craft::$app->getAssets()->ensureFolderByFullPathAndVolume($settings->assetFolderPath, $volume);
+
+            $folderPath = $settings->assetFolderPath . '/' . $type->handle;
+            $folder = Craft::$app->getAssets()->ensureFolderByFullPathAndVolume($folderPath, $volume);
 
             $asset = $this->saveAssetFromImageData($imageData, $filename, $volume->id, $folder->id, $image->assetId);
 

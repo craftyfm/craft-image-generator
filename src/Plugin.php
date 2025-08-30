@@ -2,10 +2,12 @@
 
 namespace craftyfm\imagegenerator;
 
+use BaconQrCode\Common\Mode;
 use Craft;
 use craft\base\Element;
 use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
+use craft\elements\Asset;
 use craft\elements\Entry;
 use craft\events\DefineBehaviorsEvent;
 use craft\events\ModelEvent;
@@ -107,6 +109,39 @@ class Plugin extends BasePlugin
 //            }
 //        );
 
+        Event::on(
+            Asset::class,
+            Element::EVENT_AFTER_DELETE,
+            function (Event $event) {
+
+                /** @var Asset $asset */
+                $asset = $event->sender;
+
+                if (ElementHelper::isDraftOrRevision($asset)) {
+                    return;
+                }
+                Plugin::getInstance()->imageService->handleOnDeleteAsset($asset);
+            }
+        );
+
+        Event::on(
+            Element::class,
+            Element::EVENT_AFTER_DELETE,
+            function (Event $event) {
+
+                /** @var Element $element */
+                $element = $event->sender;
+
+                if ($element instanceof Asset) {
+                    return;
+                }
+                if (ElementHelper::isDraftOrRevision($element)) {
+                    return;
+                }
+
+                Plugin::getInstance()->imageService->handleOnDeleteElement($element);
+            }
+        );
 
         Event::on(
             CraftVariable::class,

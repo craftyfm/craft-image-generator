@@ -4,6 +4,7 @@ namespace craftyfm\imagegenerator\variables;
 
 use craft\base\Element;
 use craft\errors\VolumeException;
+use craft\helpers\ElementHelper;
 use craftyfm\imagegenerator\models\Image;
 use craftyfm\imagegenerator\Plugin;
 use RuntimeException;
@@ -27,8 +28,14 @@ class ImageGenerator
      */
     public function getUrl(string $typeHandle, Element $element): string
     {
+        if (ElementHelper::isDraftOrRevision($element)) {
+            $mainElement = $element->getCanonical();
+        } else {
+            $mainElement = $element;
+        }
+
         $imageService = Plugin::getInstance()->imageService;
-        $generatedImage = $imageService->getImageByTypeHandle($typeHandle, $element->id);
+        $generatedImage = $imageService->getImageByTypeHandle($typeHandle, $mainElement->id);
 
         if (!$generatedImage) {
             $type = Plugin::getInstance()->typeService->getTypeByHandle($typeHandle);
@@ -36,15 +43,17 @@ class ImageGenerator
                 throw new RuntimeException("Image Generator: Type not found");
             }
             $generatedImage = new Image([
-                'elementId' => $element->id,
+                'elementId' => $mainElement->id,
                 'typeId' => $type->id,
             ]);
             if(!$imageService->saveGeneratedImage($generatedImage)) {
                 throw new RuntimeException("Failed to create generated image");
             }
-            return $imageService->getGenerateUrl($generatedImage->id);
         }
 
+        if (!$generatedImage->assetId) {
+            return $imageService->getGenerateUrl($generatedImage->id);
+        }
         return $generatedImage->getUrl();
     }
 }

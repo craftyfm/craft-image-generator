@@ -5,7 +5,9 @@ namespace craftyfm\imagegenerator\controllers;
 use Craft;
 use craft\web\Controller;
 use craftyfm\imagegenerator\Plugin;
+use Throwable;
 use yii\base\InvalidConfigException;
+use yii\db\StaleObjectException;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -17,14 +19,20 @@ class ImageController extends Controller
 
     public function actionIndex(): Response
     {
-
         return $this->renderTemplate('image-generator/images/index');
     }
 
     public function actionTableData()
     {
         $page = (int)$this->request->getParam('page', 1);
-        $limit = (int)$this->request->getParam('per_page', 100);
+        $limit = (int)$this->request->getParam('per_page', 25);
+
+        [$pagination, $tableData] = Plugin::getInstance()->imageService->getTableData($page, $limit);
+
+        return $this->asSuccess(data: [
+            'pagination' => $pagination,
+            'data' => $tableData,
+        ]);
     }
 
     /**
@@ -45,7 +53,7 @@ class ImageController extends Controller
             if (!$generatedImage->getAsset()) {
                 Plugin::getInstance()->imageService->generateImage($generatedImage);
             }
-        } catch (\Exception|\Throwable $e) {
+        } catch (\Exception|Throwable $e) {
            Craft::error("Failed to generate image " . $e->getMessage(), __METHOD__);
            throw new BadRequestHttpException($e->getMessage());
         }
@@ -56,5 +64,18 @@ class ImageController extends Controller
             return $this->asJson(['url' => $url]);
         }
         return $this->redirect($url);
+    }
+
+    /**
+     * @throws Throwable
+     * @throws StaleObjectException
+     */
+    public function actionDelete(): Response
+    {
+        $id = $this->request->getRequiredBodyParam('id');
+        if (Plugin::getInstance()->imageService->deleteGeneratedImage($id)) {
+            return $this->asSuccess('Status deleted successfully.');
+        }
+        return $this->asFailure('Failed to delete image.');
     }
 }
