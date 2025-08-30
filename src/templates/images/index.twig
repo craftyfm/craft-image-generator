@@ -12,13 +12,32 @@
     { label: "Generated Images"|t('app'), url: cpUrl('image-generator') }
 ] %}
 
-{% set emptyMessage = "No imagaes exist yet."|t('app') %}
+{% block sidebar %}
+    <nav aria-label="Utilities">
+        <ul>
+            <li>
+                <a class="has-badge {{ null == currentTypeId ? 'sel' }}" href="{{ cpUrl("image-generator/images") }}">
+                    <span class="label">All</span>
+                </a>
+            </li>
+            {% for type in types %}
+                <li>
+                    <a class="has-badge {{ type.id == currentTypeId ? 'sel' }}" href="{{ cpUrl("image-generator/images/#{type.handle}") }}">
+                        <span class="label">{{ type.name }}</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+{% endblock %}
+
 
 {% block content %}
     <div id="types-admin-table"></div>
     <script>
-        var tableDataEndpoint = "{{ actionUrl('image-generator/image/table-data') }}";
+        var tableDataEndpoint = "{{ actionUrl("image-generator/image/table-data") }}";
         var deleteAction = "{{ actionUrl('image-generator/image/delete') }}";
+        var type = "{{ currentTypeId }}";
     </script>
 {% endblock %}
 
@@ -68,5 +87,9 @@ new Craft.VueAdminTable({
     deleteFailMessage: 'Failed to delete types.',
     deleteSuccessMessage: 'Type deleted.',
     emptyMessage: 'No types exist yet.',
+    onQueryParams: function(params) {
+        params.type = type;
+        return params;
+    }
 });
 {% endjs %}

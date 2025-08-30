@@ -91,7 +91,6 @@ class TypeService extends Component
 
         $configPath = self::CONFIG_TYPE_KEY . '.' . $type->uid;
         $projectConfig->set($configPath, $configData);
-
         if ($isNewType) {
             $type->id = Db::idByUid(Table::GENERATED_IMAGE_TYPES_TABLE, $type->uid);
         }

@@ -17,17 +17,26 @@ class ImageController extends Controller
     protected int|bool|array $allowAnonymous = ['generate'];
 
 
-    public function actionIndex(): Response
+    public function actionIndex(string $type = null): Response
     {
-        return $this->renderTemplate('image-generator/images/index');
+        $types = Plugin::getInstance()->typeService->getAllTypes();
+        $currentTypeId = null;
+
+        foreach ($types as $t) {
+            if ($t->handle === $type) {
+                $currentTypeId = $t->id;
+                break;
+            }
+        }
+        return $this->renderTemplate('image-generator/images/index', compact('types',  'currentTypeId'));
     }
 
     public function actionTableData()
     {
         $page = (int)$this->request->getParam('page', 1);
         $limit = (int)$this->request->getParam('per_page', 25);
-
-        [$pagination, $tableData] = Plugin::getInstance()->imageService->getTableData($page, $limit);
+        $type =  $this->request->getParam('type') ? (int) $this->request->getParam('type') : null;
+        [$pagination, $tableData] = Plugin::getInstance()->imageService->getTableData($page, $limit, $type);
 
         return $this->asSuccess(data: [
             'pagination' => $pagination,

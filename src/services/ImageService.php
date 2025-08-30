@@ -72,12 +72,17 @@ class ImageService extends Component
         return $record ? new Image($record->toArray()) : null;
     }
 
-    public function getTableData(int $page, int $limit): array
+    public function getTableData(int $page, int $limit, int $type = null): array
     {
         $offset = ($page - 1) * $limit;
         /** @var ImageRecord[] $records */
-        $records = ImageRecord::find()->offset($offset)->limit($limit)->orderBy(['id' => SORT_DESC])->all();
-        $total = ImageRecord::find()->count();
+        $query = ImageRecord::find();
+        if ($type) {
+            $query->where(['typeId' => $type]);
+        }
+        $total = $query->count();
+        $query = $query->offset($offset)->limit($limit)->orderBy(['id' => SORT_DESC]);
+        $records = $query->all();
 
         // Index by ID
         $elementMap = [];

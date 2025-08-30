@@ -32,8 +32,8 @@ class TypeController extends Controller
                 'id' => $type->id,
                 'title' => $type->name,
                 'handle' => $type->handle,
-                'width' => $type->width,
-                'height' => $type->height,
+                'width' => $type->width ?? 'Auto',
+                'height' => $type->height ?? 'Auto',
                 'format' => $type->format,
                 'quality' => $type->quality,
                 'url' => $type->getCpEditUrl(),
@@ -88,12 +88,11 @@ class TypeController extends Controller
         $type->id = $request->getBodyParam('id') ?? null;
         $type->name = $request->getBodyParam('name');
         $type->handle = $request->getBodyParam('handle');
-        $type->width = $request->getBodyParam('width');
-        $type->height = $request->getBodyParam('height');
+        $type->width = ($request->getBodyParam('width')) ? (int)$request->getBodyParam('width') : null;
+        $type->height = ($request->getBodyParam('height')) ? (int)$request->getBodyParam('height') : null;
         $type->format = $request->getBodyParam('format', 'jpg');
         $type->quality = (int)$request->getBodyParam('quality', 80);
         $type->template = $request->getBodyParam('template');
-
 
         // Save the type
         if (!Plugin::getInstance()->typeService->saveType($type)) {

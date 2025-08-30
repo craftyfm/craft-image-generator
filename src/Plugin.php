@@ -169,6 +169,7 @@ class Plugin extends BasePlugin
                 // Type routes
                 $event->rules['image-generator'] = 'image-generator/image/index';
                 $event->rules['image-generator/images'] = 'image-generator/image/index';
+                $event->rules['image-generator/images/<type:{handle}>'] = 'image-generator/image/index';
 
                 $event->rules['image-generator/types'] = 'image-generator/type/index';
                 $event->rules['image-generator/types/new'] = 'image-generator/type/edit';
