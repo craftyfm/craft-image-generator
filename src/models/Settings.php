@@ -29,17 +29,9 @@ class Settings extends Model
     public function rules(): array
     {
         return [
-            [['elementTemplateMapping'], ArrayValidator::class],
             [['assetVolumeHandle', 'assetFolderPath'], 'string'],
+            [['assetVolumeHandle', 'assetFolderPath'], 'required'],
         ];
     }
 
-    public function attributeLabels(): array
-    {
-        return [
-            'elementTemplateMapping' => 'Element Template Mapping',
-            'assetVolumeHandle' => 'Asset Volume',
-            'assetFolderPath' => 'Asset Folder Path',
-        ];
-    }
 }
