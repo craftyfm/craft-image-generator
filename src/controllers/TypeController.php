@@ -79,6 +79,7 @@ class TypeController extends Controller
      */
     public function actionSave(): ?Response
     {
+        $this->requireAdmin();
         $this->requirePostRequest();
 
         $request = Craft::$app->getRequest();

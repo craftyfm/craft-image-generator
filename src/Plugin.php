@@ -171,11 +171,12 @@ class Plugin extends BasePlugin
                 }
                 $generatedImages = Plugin::getInstance()->imageService->getImagesForElement($mainElement);
 
-                $html = Craft::$app->view->renderTemplate('image-generator/_cp/element-sidebar', [
-                    'images' => $generatedImages,
-                ]);
-                $event->html .= $html;
-
+                if ($generatedImages) {
+                    $html = Craft::$app->view->renderTemplate('image-generator/_cp/element-sidebar', [
+                        'images' => $generatedImages,
+                    ]);
+                    $event->html .= $html;
+                }
             });
     }
 
