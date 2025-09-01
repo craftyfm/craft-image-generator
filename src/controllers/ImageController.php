@@ -70,16 +70,25 @@ class ImageController extends Controller
 
     public function actionBulkRegenerate(int $typeId = null): ?Response
     {
-        $query = ImageRecord::find();
-        if ($typeId) {
-            $query->where(['typeId' => $typeId]);
+        $typeId = $this->request->getBodyParam('typeId');
+        $ids = $this->request->getBodyParam('ids');
+
+        if (!$ids) {
+            $query = ImageRecord::find();
+
+            if ($typeId) {
+                $query->where(['typeId' => $typeId]);
+            }
+
+            $ids = $query->select('id')->column();
         }
-        $ids = $query->select('id')->column();
 
         Craft::$app->queue->push(new RegenerateImagesJob([
             'imageIds' => $ids,
         ]));
+
         return $this->asSuccess("Regenerate queue started");
+
     }
 
 

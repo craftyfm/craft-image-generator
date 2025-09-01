@@ -1,5 +1,11 @@
 <fieldset>
-    <legend class="h6">Generated Image</legend>
+    <legend >
+        <span class="h6 mr-4">Generated Image</span>
+        <button class="image-generator-regenerates" data-ids="{{ images|map(e => e.id)|json_encode }}"
+                data-url="{{ actionUrl('image-generator/image/bulk-regenerate')}}">
+            <span data-icon="refresh" class=""></span>
+        </button>
+    </legend>
 
     <div class="meta">
         {% for image in images %}
@@ -48,6 +54,35 @@
             span.classList.remove('spinner');
         });
 
+    });
+
+    document.querySelector('.image-generator-regenerates').addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const button = e.currentTarget;
+        const url = button.getAttribute('data-url');
+        const span = button.querySelector('span');
+        span.classList.add('spinner');
+        fetch(url, {
+            method: 'POST', // usually POST for Craft actions
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-Token': Craft.csrfTokenValue,
+            },
+            body: JSON.stringify({
+                ids: JSON.parse(button.getAttribute('data-ids')),
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                Craft.cp.displaySuccess("Image Regenerated");
+                span.classList.remove('spinner');
+            })
+            .catch(error => {
+                Craft.cp.displayError("Failed to regenerate image");
+                span.classList.remove('spinner');
+            });
     });
 
 {% endjs %}

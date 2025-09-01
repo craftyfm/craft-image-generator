@@ -13,9 +13,11 @@
 ] %}
 
 {% block actionButton %}
-    <form method="post" action="{{ cpUrl('image-generator/images/bulk-regenerate/' ~ currentTypeId) }}">
+    <form method="post">
+        {{ actionInput('image-generator/image/bulk-regenerate') }}
         {{ csrfInput() }}
         {{ redirectInput(craft.app.request.absoluteUrl) }}
+        <input type="hidden" name="typeId" value="{{ currentTypeId }}">
         <button type="submit" class="btn submit">
             <span data-icon="refresh" class=""></span>
             {{ "Regenerate"|t('image-generator') }}
