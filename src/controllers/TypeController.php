@@ -9,7 +9,6 @@ use craft\errors\StaleResourceException;
 use craft\web\Controller;
 use craftyfm\imagegenerator\models\ImageType;
 use craftyfm\imagegenerator\Plugin;
-use craftyfm\imagegenerator\services\TypeService;
 use yii\base\ErrorException;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;

@@ -6,7 +6,6 @@ use Craft;
 use craft\base\Element;
 use craft\base\Model;
 use craft\elements\Asset;
-use craft\helpers\UrlHelper;
 use craftyfm\imagegenerator\Plugin;
 use DateTime;
 use RuntimeException;

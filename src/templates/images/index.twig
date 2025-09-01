@@ -12,6 +12,18 @@
     { label: "Generated Images"|t('app'), url: cpUrl('image-generator') }
 ] %}
 
+{% block actionButton %}
+    <form method="post" action="{{ cpUrl('image-generator/images/bulk-regenerate/' ~ currentTypeId) }}">
+        {{ csrfInput() }}
+        {{ redirectInput(craft.app.request.absoluteUrl) }}
+        <button type="submit" class="btn submit">
+            <span data-icon="refresh" class=""></span>
+            {{ "Regenerate"|t('image-generator') }}
+        </button>
+    </form>
+{% endblock %}
+
+
 {% block sidebar %}
     <nav aria-label="Utilities">
         <ul>

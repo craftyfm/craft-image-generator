@@ -3,16 +3,10 @@
 namespace craftyfm\imagegenerator\variables;
 
 use craft\base\Element;
-use craft\errors\VolumeException;
 use craft\helpers\ElementHelper;
 use craftyfm\imagegenerator\models\Image;
 use craftyfm\imagegenerator\Plugin;
 use RuntimeException;
-use Throwable;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
-use yii\base\ErrorException;
 use yii\base\InvalidConfigException;
 use yii\db\Exception;
 

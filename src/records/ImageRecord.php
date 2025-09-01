@@ -2,7 +2,6 @@
 
 namespace craftyfm\imagegenerator\records;
 
-use craft\db\ActiveQuery;
 use craft\db\ActiveRecord;
 use craftyfm\imagegenerator\helper\Table;
 

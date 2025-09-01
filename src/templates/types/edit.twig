@@ -5,7 +5,7 @@
 {% set title = isNew ? "Create a new image type"|t('image-generator') : type.name %}
 
 {% set crumbs = [
-    { label: "Image Generator"|t('image-generator'), url: url('image-generator') },
+    { label: "Generated Images"|t('app'), url: cpUrl('image-generator') }
     { label: "Types"|t('image-generator'), url: url('image-generator/types') }
 ] %}
 

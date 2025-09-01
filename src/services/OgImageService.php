@@ -8,19 +8,17 @@ use craft\base\Element;
 use craft\elements\Asset;
 use craft\elements\Entry;
 use craft\errors\VolumeException;
-use craft\feedme\helpers\AssetHelper;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
 use craft\models\Volume;
 use craft\models\VolumeFolder;
+use craft\records\Relations;
 use craft\web\View;
 use craftyfm\imagegenerator\models\Settings;
 use craftyfm\imagegenerator\Plugin;
-use craft\records\Relations;
 use Spatie\Browsershot\Browsershot;
 use Throwable;
 use yii\base\InvalidConfigException;
-use yii\web\NotFoundHttpException;
 
 /**
  *  Image Service

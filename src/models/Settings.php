@@ -3,8 +3,6 @@
 namespace craftyfm\imagegenerator\models;
 
 use craft\base\Model;
-use craft\behaviors\EnvAttributeParserBehavior;
-use craft\validators\ArrayValidator;
 
 /**
  *  Image Generator settings

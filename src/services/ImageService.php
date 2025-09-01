@@ -7,7 +7,6 @@ use craft\base\Component;
 use craft\base\Element;
 use craft\elements\Asset;
 use craft\errors\VolumeException;
-use craft\feedme\helpers\AssetHelper;
 use craft\helpers\AdminTable;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
@@ -16,7 +15,6 @@ use craft\web\View;
 use craftyfm\imagegenerator\jobs\DeleteImagesForElementJob;
 use craftyfm\imagegenerator\models\Image;
 use craftyfm\imagegenerator\models\ImageType;
-use craftyfm\imagegenerator\models\Settings;
 use craftyfm\imagegenerator\Plugin;
 use craftyfm\imagegenerator\records\ImageRecord;
 use craftyfm\imagegenerator\records\ImageTypeRecord;
@@ -29,12 +27,25 @@ use Twig\Error\SyntaxError;
 use yii\base\ErrorException;
 use yii\db\Exception;
 use yii\db\StaleObjectException;
-use yii\web\NotFoundHttpException;
 
 class ImageService extends Component
 {
 
     private bool $_onDeletingAsset = false;
+
+    public function getImages(array $params = []): array
+    {
+        $query = ImageRecord::find();
+        if ($params) {
+            $query->where($params);
+        }
+        $records = $query->all();
+        $models = [];
+        foreach ($records as $record) {
+            $models[] = new Image($record->toArray());
+        }
+        return $models;
+    }
     public function getImageById(int $id): ?Image
     {
         $record = ImageRecord::findOne(['id' => $id]);

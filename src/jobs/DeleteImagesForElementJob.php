@@ -2,12 +2,8 @@
 
 namespace craftyfm\imagegenerator\jobs; // ← change to your plugin/module namespace
 
-use Craft;
-use craft\base\ElementInterface;
-use craft\elements\db\ElementQueryInterface;
 use craft\queue\BaseJob;
 use craftyfm\imagegenerator\Plugin;
-use yii\base\InvalidConfigException;
 
 /**
  * Queue job to delete one or many elements.

@@ -3,16 +3,12 @@
 namespace craftyfm\imagegenerator\controllers;
 
 use Craft;
-use craft\errors\VolumeException;
 use craft\web\Controller;
+use craftyfm\imagegenerator\jobs\RegenerateImagesJob;
 use craftyfm\imagegenerator\Plugin;
+use craftyfm\imagegenerator\records\ImageRecord;
 use Throwable;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
-use yii\base\ErrorException;
 use yii\base\InvalidConfigException;
-use yii\db\Exception;
 use yii\db\StaleObjectException;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
@@ -70,6 +66,20 @@ class ImageController extends Controller
             return $this->asFailure("Failed to generate image");
         }
 
+    }
+
+    public function actionBulkRegenerate(int $typeId = null): ?Response
+    {
+        $query = ImageRecord::find();
+        if ($typeId) {
+            $query->where(['typeId' => $typeId]);
+        }
+        $ids = $query->select('id')->column();
+
+        Craft::$app->queue->push(new RegenerateImagesJob([
+            'imageIds' => $ids,
+        ]));
+        return $this->asSuccess("Regenerate queue started");
     }
 
 

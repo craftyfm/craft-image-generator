@@ -4,17 +4,14 @@ namespace craftyfm\imagegenerator\services;
 
 use Craft;
 use craft\base\Component;
-use craft\db\Query;
 use craft\errors\BusyResourceException;
 use craft\errors\StaleResourceException;
 use craft\events\ConfigEvent;
 use craft\helpers\Db;
-use craft\helpers\ProjectConfig as ProjectConfigHelper;
 use craft\helpers\StringHelper;
 use craftyfm\imagegenerator\helper\Table;
 use craftyfm\imagegenerator\models\ImageType;
 use craftyfm\imagegenerator\records\ImageTypeRecord;
-use DateTime;
 use yii\base\ErrorException;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;

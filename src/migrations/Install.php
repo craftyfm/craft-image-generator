@@ -2,7 +2,6 @@
 
 namespace craftyfm\imagegenerator\migrations;
 
-use Craft;
 use craft\db\Migration;
 use craftyfm\imagegenerator\helper\Table;
 

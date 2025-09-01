@@ -15,7 +15,7 @@ class ImageType extends Model
     public string $template = '';
     public ?int $width = null;
     public ?int $height = null;
-    public string $format = 'jpg';
+    public string $format = 'jpeg';
     public int $quality = 80;
     public ?DateTime $dateCreated = null;
     public ?DateTime $dateUpdated = null;
@@ -49,9 +49,8 @@ class ImageType extends Model
     public function getFormatOptions(): array
     {
         return [
-            'jpg' => 'JPG',
-            'jpeg' => 'JPEG',
             'png' => 'PNG',
+            'jpeg' => 'JPEG',
             'webp' => 'WEBP',
         ];
 

@@ -2,22 +2,15 @@
 
 namespace craftyfm\imagegenerator;
 
-use BaconQrCode\Common\Mode;
 use Craft;
 use craft\base\Element;
-use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
 use craft\elements\Asset;
-use craft\elements\Category;
-use craft\elements\Entry;
-use craft\events\DefineBehaviorsEvent;
 use craft\events\DefineHtmlEvent;
-use craft\events\ModelEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\helpers\ElementHelper;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
-use craftyfm\imagegenerator\behaviors\ElementImageBehavior;
 use craftyfm\imagegenerator\models\Settings;
 use craftyfm\imagegenerator\services\ImageService;
 use craftyfm\imagegenerator\services\TypeService;
@@ -194,6 +187,9 @@ class Plugin extends BasePlugin
                 $event->rules['image-generator'] = 'image-generator/image/index';
                 $event->rules['image-generator/images'] = 'image-generator/image/index';
                 $event->rules['image-generator/images/<type:{handle}>'] = 'image-generator/image/index';
+
+                $event->rules['image-generator/images/bulk-regenerate'] = 'image-generator/image/bulk-regenerate';
+                $event->rules['image-generator/images/bulk-regenerate/<typeId:\\d+>'] = 'image-generator/image/bulk-regenerate';
 
                 $event->rules['image-generator/types'] = 'image-generator/type/index';
                 $event->rules['image-generator/types/new'] = 'image-generator/type/edit';
