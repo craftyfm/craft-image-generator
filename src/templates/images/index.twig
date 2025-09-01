@@ -57,6 +57,21 @@
 
 {% js %}
 
+var actions = [
+    {
+        label: Craft.t('image-generator', 'Regenerate'),
+        actions: [
+            {
+                label: Craft.t('image-generator', 'Regenerate'),
+                action: 'image-generator/image/bulk-regenerate',
+                confirmMessage: 'Are you sure you want to regenerate all images?',
+                allowMultiple: true,
+                separator: true
+            }
+        ]
+    }
+];
+
 const columns = [
     { name: 'id', title: "id" },
     {
@@ -94,6 +109,7 @@ const columns = [
 
 
 new Craft.VueAdminTable({
+    actions:actions,
     columns: columns,
     container: '#types-admin-table',
     tableDataEndpoint: tableDataEndpoint,
@@ -101,6 +117,7 @@ new Craft.VueAdminTable({
     deleteFailMessage: 'Failed to delete types.',
     deleteSuccessMessage: 'Type deleted.',
     emptyMessage: 'No types exist yet.',
+    checkboxes: true,
     onQueryParams: function(params) {
         params.type = type;
         return params;
