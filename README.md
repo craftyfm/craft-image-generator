@@ -29,6 +29,17 @@ Then enable it in the Craft Control Panel.
 
 ---
 
+## Requirements
+
+This plugin requires the following to work properly:
+
+- **Node.js** (v22 or higher) – [Download here](https://nodejs.org/)
+- **Puppeteer** – used via [Browsershot](https://github.com/spatie/browsershot) for image generation
+- **Chromium** – Puppeteer requires a Chrome/Chromium installation
+
+Make sure these dependencies are installed and accessible on your system before using the plugin.
+---
+
 ## Plugin Settings
 
 The plugin provides several configuration options in the Control Panel:
@@ -37,7 +48,9 @@ The plugin provides several configuration options in the Control Panel:
 * **Node Path** – Path to the `node` binary.
 * **Chrome Path** *(optional)* – Path to the Chrome/Chromium binary.
 
-    * If not set, Browsershot will use its default.
+If not set, Browsershot will use its default.
+
+
 * **Asset Volume** – The asset volume where generated images will be stored.
 * **Folder Path** – The folder inside the chosen asset volume where images will be saved. *(Required)*
 

@@ -33,7 +33,7 @@ class ImageController extends Controller
         return $this->renderTemplate('image-generator/images/index', compact('types',  'currentTypeId'));
     }
 
-    public function actionTableData()
+    public function actionTableData(): ?Response
     {
         $page = (int)$this->request->getParam('page', 1);
         $limit = (int)$this->request->getParam('per_page', 25);
@@ -44,6 +44,12 @@ class ImageController extends Controller
             'pagination' => $pagination,
             'data' => $tableData,
         ]);
+    }
+
+    public function actionView(int $id): ?Response
+    {
+        $image = Plugin::getInstance()->imageService->getImageById($id);
+        return $this->renderTemplate('image-generator/images/view', compact('image'));
     }
 
     /**
@@ -68,7 +74,7 @@ class ImageController extends Controller
 
     }
 
-    public function actionBulkRegenerate(int $typeId = null): ?Response
+    public function actionBulkRegenerate(): ?Response
     {
         $typeId = $this->request->getBodyParam('typeId');
         $ids = $this->request->getBodyParam('ids');

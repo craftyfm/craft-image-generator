@@ -145,8 +145,9 @@ class ImageService extends Component
         $tableData = [];
         foreach ($records as $record) {
             $tableData[] = [
+                'title' => $record->id,
                 'id' => $record->id,
-
+                'url' => $this->getCpUrl($record->id),
                 'type' => isset($typeMap[$record->typeId])
                     ? [
                         'title' => $typeMap[$record->typeId]->name,
@@ -294,6 +295,11 @@ class ImageService extends Component
             Craft::error("Failed to generate image with element id: " . $element->id . 'and type: ' . $type->handle . ' with reasons: ' .$e->getMessage(), __METHOD__);
             throw $e;
         }
+    }
+
+    public function getCpUrl(int $id): string
+    {
+        return UrlHelper::cpUrl('image-generator/images/' . $id);
     }
 
     public function getGenerateUrl(int $generatedImageId): string

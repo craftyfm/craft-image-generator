@@ -11,7 +11,7 @@
         {% for image in images %}
             <div class="field lightswitch-field">
                 <div class="heading">
-                    {{ image.type.name }}
+                   <a href="{{ image.getCpUrl() }}"> {{ image.type.name }}</a>
                 </div>
                 <div class="input ltr">
                     <button class="image-generator-regenerate" data-id="{{ image.id }}"

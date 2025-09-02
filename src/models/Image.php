@@ -100,4 +100,12 @@ class Image extends Model
             [['assetId', 'elementId', 'typeId'], 'integer'],
         ];
     }
+
+    public function getCpUrl(): string
+    {
+        if (!$this->id) {
+            throw new RuntimeException("Generated Image doesn't have id.");
+        }
+        return Plugin::getInstance()->imageService->getCpUrl($this->id);
+    }
 }

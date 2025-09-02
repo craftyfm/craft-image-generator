@@ -187,6 +187,7 @@ class Plugin extends BasePlugin
                 $event->rules['image-generator'] = 'image-generator/image/index';
                 $event->rules['image-generator/images'] = 'image-generator/image/index';
                 $event->rules['image-generator/images/<type:{handle}>'] = 'image-generator/image/index';
+                $event->rules['image-generator/images/<id:\\d+>'] = 'image-generator/image/view';
 
                 $event->rules['image-generator/types'] = 'image-generator/type/index';
                 $event->rules['image-generator/types/new'] = 'image-generator/type/edit';
