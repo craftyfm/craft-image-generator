@@ -344,7 +344,7 @@ class ImageService extends Component
 
     private function generateFilename(string $format, Element $element): string
     {
-        $slug = $element->id . '-' . ($element->slug ?? StringHelper::toKebabCase($element->title ?? '-image'));
+        $slug = $element->id . '-' . ($element->slug ?? StringHelper::toKebabCase($element->title ?? '-image')) . '-' . StringHelper::randomString(4);
         return "ig-$slug.$format";
     }
     private function generateImageFromHtml(string $html, ImageType $type): ?string
@@ -355,6 +355,8 @@ class ImageService extends Component
             ->setNpmBinary('/usr/local/bin/npm')
             ->setChromePath("/usr/bin/chromium")
             ->noSandbox()
+            ->waitUntilNetworkIdle()
+            ->ignoreHttpsErrors()
             ->deviceScaleFactor(1)
             ->format($type->format);
 

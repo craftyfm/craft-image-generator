@@ -56,7 +56,7 @@ class ImageController extends Controller
      * @throws NotFoundHttpException
      * @throws BadRequestHttpException
      */
-    public function actionRegenerate(): Response
+    public function actionRegenerate(): ?Response
     {
         $id = $this->request->getRequiredBodyParam('id');
         $generatedImage = Plugin::getInstance()->imageService->getImageById($id);
@@ -67,7 +67,7 @@ class ImageController extends Controller
 
         try {
             Plugin::getInstance()->imageService->generateImage($generatedImage);
-            return $this->asSuccess();
+            return $this->asSuccess("Image regenerated");
         } catch (\Exception|Throwable $e) {
             return $this->asFailure("Failed to generate image");
         }
@@ -118,7 +118,7 @@ class ImageController extends Controller
             }
         } catch (\Exception|Throwable $e) {
            Craft::error("Failed to generate image " . $e->getMessage(), __METHOD__);
-           throw new BadRequestHttpException($e->getMessage());
+           throw new BadRequestHttpException($e);
         }
 
 
