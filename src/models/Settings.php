@@ -24,6 +24,7 @@ class Settings extends Model
     public ?string $npmPath = null;
     public ?string $chromePath = null;
 
+    public bool $disableWebSecurity = false;
     public function rules(): array
     {
         return [

@@ -376,6 +376,12 @@ class ImageService extends Component
             $browsershot->windowSize($type->width, $type->height);
         }
 
+        if ($settings->disableWebSecurity) {
+            $browsershot->setOption('args', [
+                '--disable-web-security',
+            ]);
+        }
+
         $browsershot->quality($type->quality);
 
         return $browsershot->screenshot();

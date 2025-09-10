@@ -37,3 +37,10 @@
     name: 'chromePath',
     value: settings.chromePath
 }) }}
+
+{{ forms.lightswitchField({
+    label: "Disable Web Security"|t('image-generator'),
+    instructions: "Disable web security, e.g. cors"|t('image-generator'),
+    name: 'disableWebSecurity',
+    on: settings.disableWebSecurity
+}) }}
