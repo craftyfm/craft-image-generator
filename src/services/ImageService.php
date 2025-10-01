@@ -8,6 +8,7 @@ use craft\base\Element;
 use craft\elements\Asset;
 use craft\errors\VolumeException;
 use craft\helpers\AdminTable;
+use craft\helpers\Db;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
@@ -229,9 +230,12 @@ class ImageService extends Component
 
     public function handleOnDeleteElement(Element $element): void
     {
-        Craft::$app->queue->push(new DeleteImagesForElementJob([
-            'elementId' => $element->id,
-        ]));
+        $count = ImageRecord::find()->where(['elementId' => $element->id])->count();
+        if ($count) {
+            Craft::$app->queue->push(new DeleteImagesForElementJob([
+                'elementId' => $element->id,
+            ]));
+        }
     }
 
 
