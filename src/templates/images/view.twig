@@ -60,7 +60,7 @@
             <div class="field">
                 <div class="heading">Last Generated</div>
                 <div class="input ltr">
-                   {{ asset.dateUpdated|datetime }}
+                   {{ asset ? asset.dateUpdated|datetime : "-" }}
                 </div>
             </div>
         </div>
