@@ -40,7 +40,9 @@
             <div class="field">
                 <div class="heading">Asset</div>
                 <div class="input ltr">
-                    <a href="{{ asset.getCpEditUrl() }}">{{ asset.filename }}</a>
+                    {% if asset %}
+                      <a href="{{ asset.getCpEditUrl() }}">{{ asset.filename }}</a>
+                    {% endif %}
                 </div>
             </div>
             <div class="field">
